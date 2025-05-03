@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .modal-content {
+            border-radius: 10px;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .toast-message {
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .toast-icon {
+            margin-right: 10px;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        .password-strength {
+            margin-top: 10px;
+        }
+        .password-strength .indicator {
+            width: 100%;
+            height: 5px;
+            background-color: #ddd;
+            border-radius: 5px;
+        }
+        .password-strength .progress {
+            height: 5px;
+            border-radius: 5px;
+        }
+        .password-strength .progress-bar {
+            background-color: #f00;
+        }
+        .password-strength .progress-bar.weak {
+            background-color: #f00;
+        }
+        .password-strength .progress-bar.medium {
+            background-color: #ff0;
+        }
+        .password-strength .progress-bar.strong {
+            background-color: #0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">User Management</h1>
+        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addUserModal">Add User</button>
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>DOB</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersTable">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserForm">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                            <div class="password-strength">
+                                <div class="indicator">
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <small id="passwordHelp" class="form-text text-muted"></small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="dob">Date of Birth</label>
+                            <input type="date" class="form-control" id="dob" name="dob" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add User</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update User Modal -->
+    <div class="modal fade" id="updateUserModal" tabindex="-1" role="dialog" aria-labelledby="updateUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="password-strength">
+                    <div class="indicator">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <small id="updatePasswordHelp" class="form-text text-muted"></small>
+                </div>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateUserModalLabel">Update User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateUserForm">
+                        <div class="form-group">
+                            <label for="updateName">Name</label>
+                            <input type="text" class="form-control" id="updateName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateEmail">Email</label>
+                            <input type="email" class="form-control" id="updateEmail" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updatePassword">Password</label>
+                            <input type="password" class="form-control" id="updatePassword" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateDob">Date of Birth</label>
+                            <input type="date" class="form-control" id="updateDob" name="dob" required>
+                        </div>
+                        <input type="hidden" id="userId" name="id">
+                        <button type="submit" class="btn btn-primary">Update User</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
+        <div class="toast-header">
+            <i class="fas fa-check-circle toast-icon"></i>
+            <strong class="mr-auto">Success</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body toast-message">
+            Data stored successfully!
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            loadUsers();
+
+            $('#addUserForm').submit(function(e) {
+                e.preventDefault();
+                const userData = {
+                    name: $('#name').val(),
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                    dob: $('#dob').val()
+                };
+                if (validatePassword(userData.password)) {
+                    $.ajax({
+                        url: 'api/index.php',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(userData),
+                        success: function(response) {
+                            $('#addUserModal').modal('hide');
+                            showSuccessToast('Data stored successfully!');
+                            loadUsers();
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error adding user:', error);
+                            alert('Error adding user. Please try again.');
+                        }
+                    });
+                } else {
+                    $('#passwordHelp').text('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+                }
+            });
+
+            $('#password').on('input', function() {
+                const password = $(this).val();
+                const strength = getPasswordStrength(password);
+                const progressBar = $('.password-strength .progress-bar');
+                const helpText = $('#passwordHelp');
+
+                progressBar.css('width', strength + '%');
+                progressBar.removeClass('weak medium strong');
+                progressBar.addClass(strength < 50 ? 'weak' : strength < 75 ? 'medium' : 'strong');
+
+                if (strength < 50) {
+                    helpText.text('Weak password');
+                } else if (strength < 75) {
+                    helpText.text('Medium strength password');
+                } else {
+                    helpText.text('Strong password');
+                }
+            });
+
+            $('#updatePassword').on('input', function() {
+                const password = $(this).val();
+                const strength = getPasswordStrength(password);
+                const progressBar = $('.password-strength .progress-bar');
+                const helpText = $('#updatePasswordHelp');
+
+                progressBar.css('width', strength + '%');
+                progressBar.removeClass('weak medium strong');
+                progressBar.addClass(strength < 50 ? 'weak' : strength < 75 ? 'medium' : 'strong');
+
+                if (strength < 50) {
+                    helpText.text('Weak password');
+                } else if (strength < 75) {
+                    helpText.text('Medium strength password');
+                } else {
+                    helpText.text('Strong password');
+                }
+            });
+
+            $('#usersTable').on('click', '.edit-btn', function() {
+                const userId = $(this).data('id');
+                $.ajax({
+                    url: 'api/index.php',
+                    type: 'GET',
+                    data: { id: userId },
+                    success: function(response) {
+                        const user = response[0];
+                        $('#updateName').val(user.name);
+                        $('#updateEmail').val(user.email);
+                        $('#updatePassword').val('');
+                        $('#updateDob').val(user.dob);
+                        $('#userId').val(user.id);
+                        $('#updateUserModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching user:', error);
+                        alert('Error fetching user. Please try again.');
+                    }
+                });
+            });
+
+            $('#updateUserForm').submit(function(e) {
+                e.preventDefault();
+                const userData = {
+                    id: $('#userId').val(),
+                    name: $('#updateName').val(),
+                    email: $('#updateEmail').val(),
+                    password: $('#updatePassword').val(),
+                    dob: $('#updateDob').val()
+                };
+                if (validatePassword(userData.password)) {
+                    $.ajax({
+                        url: 'api/index.php',
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify(userData),
+                        success: function(response) {
+                            $('#updateUserModal').modal('hide');
+                            showSuccessToast('Data updated successfully!');
+                            loadUsers();
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating user:', error);
+                            alert('Error updating user. Please try again.');
+                        }
+                    });
+                } else {
+                    $('#updatePasswordHelp').text('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+                }
+            });
+
+            $('#usersTable').on('click', '.delete-btn', function() {
+                const userId = $(this).data('id');
+                if (confirm('Are you sure you want to delete this user?')) {
+                    $.ajax({
+                        url: 'api/index.php',
+                        type: 'DELETE',
+                        data: { id: userId },
+                        success: function(response) {
+                            console.log(response);
+                            if (response.message) {
+                                showSuccessToast(response.message);
+                                loadUsers();
+                            } else {
+                                showSuccessToast('Data deleted successfully!');
+                                loadUsers();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error deleting user:', error);
+                            alert('Error deleting user. Please try again.');
+                        }
+                    });
+                }
+            });
+
+            function loadUsers() {
+                $.ajax({
+                    url: 'api/index.php',
+                    type: 'GET',
+                    success: function(response) {
+                        console.log(response);
+                        const users = response;
+                        let html = '';
+                        users.forEach(function(user) {
+                            html += `
+                                <tr>
+                                    <td>${user.id}</td>
+                                    <td>${user.name}</td>
+                                    <td>${user.email}</td>
+                                    <td>${user.dob}</td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm edit-btn" data-id="${user.id}"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-danger btn-sm delete-btn" data-id="${user.id}"><i class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        $('#usersTable').html(html);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading users:', error);
+                        alert('Error loading users. Please try again.');
+                    }
+                });
+            }
+
+            function showSuccessToast(message) {
+                $('.toast-body').text(message);
+                $('.toast').toast('show');
+            }
+
+            function validatePassword(password) {
+                const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                return regex.test(password);
+            }
+
+            function getPasswordStrength(password) {
+                let strength = 0;
+                if (password.length >= 8) strength += 25;
+                if (password.match(/[a-z]/)) strength += 25;
+                if (password.match(/[A-Z]/)) strength += 25;
+                if (password.match(/\d/)) strength += 25;
+                if (password.match(/[@$!%*?&]/)) strength += 25;
+                return Math.min(strength, 100);
+            }
+        });
+    </script>
+</body>
+</html>
